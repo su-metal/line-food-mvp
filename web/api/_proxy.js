@@ -14,12 +14,12 @@ function readBody(req) {
 export default async function proxy(req, res, { pathRewrite } = {}) {
   // 上流のベースURL。line-food-web では UPSTREAM_BASE を使う想定
   const upstream = process.env.UPSTREAM_BASE || process.env.MVP_API_BASE;
-  if (!upstream) {
-    res.statusCode = 502;
-    res.setHeader('content-type', 'application/json; charset=utf-8');
-    res.end(JSON.stringify({ ok: false, error: 'UPSTREAM_BASE not set' }));
-    return;
-  }
+if (!upstream) {
+  return new Response(
+    JSON.stringify({ ok: false, error: 'UPSTREAM_BASE not set' }),
+    { status: 501, headers: { 'content-type': 'application/json' } }
+  );
+}
 
   const incoming = new NodeURL(req.url, `https://${req.headers.host}`);
   const path = pathRewrite ?? incoming.pathname;
